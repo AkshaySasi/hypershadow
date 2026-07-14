@@ -78,12 +78,14 @@ seq = t["points"]                    # (1800, 16, 512, 3)
 
 | Method | Accuracy (static) |
 |---|---|
-| intrinsic dimension, best threshold | 0.732 |
+| intrinsic dimension, best threshold | 0.737 +/- 0.004 |
 | persistent homology + GBT | 0.904 |
 | geometric features + GBT | 0.956 |
-| PointNet-lite, 190k params | 0.966 |
+| PointNet-lite, 190k params | 0.962 +/- 0.003 |
 
-Temporal track: Kabsch rigidity residual threshold, AUROC 0.982.
+Uncertainty is the standard deviation over five random splits or training
+seeds. Temporal track: Kabsch rigidity residual threshold, AUROC 0.982,
+held-out accuracy 0.978 +/- 0.004.
 
 ## Reproducing or extending
 

@@ -31,7 +31,7 @@
 \maketitle
 
 \begin{abstract}
-Machine-learning datasets labelled ``4D'' universally denote three spatial dimensions plus time. We introduce \textbf{HyperShadow}, the first public benchmark in which the fourth, fifth, and sixth dimensions are \emph{spatial}: the task is to decide whether a 3D point cloud is a native three-dimensional shape or the projection, the ``shadow'', of a rigid object living in $\mathbb{R}^N$ ($N{=}4$--$6$). We show this task is fundamentally distinct from intrinsic-dimension estimation: a shadow is still at-most-3-dimensional data, and standard estimators (TwoNN, Levina--Bickel MLE) reach only 71--73\% accuracy. Detection instead requires \emph{projection signatures}, density folds, filled volumes with characteristic radial profiles, and topology changes, which a 190k-parameter point network recovers at 96.6\% accuracy across four corruption tiers, generalizing at 79--91\% to object families never seen in training. On a temporal track of rigidly rotating objects we introduce a zero-parameter \emph{rigidity witness}: the residual of the optimal rigid 3D alignment (Kabsch) between consecutive frames, which must vanish for any rigid 3D motion but cannot vanish for the shadow of a rigid rotation in $\mathbb{R}^N$. This single interpretable statistic separates the classes at AUROC 0.982. All data are generated reproducibly from seeds; the dataset, models, and code are released publicly. HyperShadow makes no claim about physical reality; it is a controlled instrument for studying which observable statistics can \emph{certify incompatibility with a purely three-dimensional explanation}.
+Machine-learning datasets labelled ``4D'' universally denote three spatial dimensions plus time. We introduce \textbf{HyperShadow}, the first public benchmark in which the fourth, fifth, and sixth dimensions are \emph{spatial}: the task is to decide whether a 3D point cloud is a native three-dimensional shape or the projection, the ``shadow'', of a rigid object living in $\mathbb{R}^N$ ($N{=}4$--$6$). We show this task is fundamentally distinct from intrinsic-dimension estimation: a shadow is still at-most-3-dimensional data, and standard estimators (TwoNN, Levina--Bickel MLE) reach only 71--73\% accuracy. Detection instead requires \emph{projection signatures}, density folds, filled volumes with characteristic radial profiles, and topology changes, which a 190k-parameter point network recovers at 96.2\% accuracy (std 0.3\% over five seeds) across four corruption tiers, generalizing at 79--91\% to object families never seen in training. On a temporal track of rigidly rotating objects we introduce a zero-parameter \emph{rigidity witness}: the residual of the optimal rigid 3D alignment (Kabsch) between consecutive frames, which must vanish for any rigid 3D motion but cannot vanish for the shadow of a rigid rotation in $\mathbb{R}^N$. This single interpretable statistic separates the classes at AUROC 0.982. All data are generated reproducibly from seeds; the dataset, models, and code are released publicly. HyperShadow makes no claim about physical reality; it is a controlled instrument for studying which observable statistics can \emph{certify incompatibility with a purely three-dimensional explanation}.
 \end{abstract}
 
 \section{Introduction}
@@ -40,7 +40,7 @@ A cube held before a lamp casts a two-dimensional shadow. The shadow is genuinel
 
 Three observations motivate the benchmark.
 
-\paragraph{(1) The task is not intrinsic-dimension estimation.} A rich literature estimates the dimension of the manifold underlying observed data \citep{levina2005mle,facco2017twonn,lee2025survey}. But a projection \emph{reduces} dimension: the orthographic shadow of the 3-sphere $S^3 \subset \mathbb{R}^4$ is a solid 3-ball; the shadow of the 2-dimensional Clifford torus remains 2-dimensional. Intrinsic dimension of the observed data therefore cannot, even in principle, fully identify shadows. What distinguishes them is \emph{how} mass, density, and topology are arranged, the signatures of the projection map itself. Section~\ref{sec:results-static} quantifies this gap: classical estimators reach 73\% on HyperShadow where a small learned model reaches 96.6\%.
+\paragraph{(1) The task is not intrinsic-dimension estimation.} A rich literature estimates the dimension of the manifold underlying observed data \citep{levina2005mle,facco2017twonn,lee2025survey}. But a projection \emph{reduces} dimension: the orthographic shadow of the 3-sphere $S^3 \subset \mathbb{R}^4$ is a solid 3-ball; the shadow of the 2-dimensional Clifford torus remains 2-dimensional. Intrinsic dimension of the observed data therefore cannot, even in principle, fully identify shadows. What distinguishes them is \emph{how} mass, density, and topology are arranged, the signatures of the projection map itself. Section~\ref{sec:results-static} quantifies this gap: classical estimators reach 73\% on HyperShadow where a small learned model reaches 96\%.
 
 \paragraph{(2) ``4D'' datasets in machine learning are space + time.} Existing 4D benchmarks, 4D world models and dynamic point-cloud suites such as MSR-Action3D, DeformingThings4D, and HOI4D \citep{tesseract2025,omniworld2025}, model 3D geometry evolving over time. To our knowledge no public dataset contains projections of objects with four or more \emph{spatial} dimensions, despite the pedagogical ubiquity of the tesseract.
 
@@ -132,7 +132,7 @@ the mean residual of the optimal rigid alignment between consecutive frames.
 
 For native sequences $w$ is bounded by the noise floor. For the shadow of a rigid rotation in $\mathbb{R}^N$, the apparent 3D motion composes visible rotation with a re-weighting of hidden coordinates; no rigid 3D map explains it, and $w$ stays bounded away from zero. Crucially, $w$ is a \emph{certificate}: a large value does not merely correlate with higher dimensionality, it \emph{rules out} the entire class of rigid-3D explanations, up to noise. This is the logical structure of a Bell inequality, transplanted to kinematics.
 
-Empirically (Figure~\ref{fig:rigidity}): native sequences concentrate at $w \approx 0$ (clean tier) and $w \approx 0.05$ (the noise tier's floor); shadows concentrate at $w \approx 0.10$, four times the clean-motion residual. A single threshold fit on half the sequences achieves \textbf{held-out accuracy 0.982 and AUROC 0.982}, with zero learned parameters. The hardest families (Clifford torus 0.92, tesseract 0.93) are those whose random rotation plane most often lies almost entirely within the visible subspace, making the shadow \emph{nearly} rigid, a geometric, not statistical, limitation.
+Empirically (Figure~\ref{fig:rigidity}): native sequences concentrate at $w \approx 0$ (clean tier) and $w \approx 0.05$ (the noise tier's floor); shadows concentrate at $w \approx 0.10$, four times the clean-motion residual. A single threshold fit on half the sequences achieves \textbf{held-out accuracy $0.978 \pm 0.004$ over five random splits and AUROC 0.982}, with zero learned parameters. The hardest families (Clifford torus 0.92, tesseract 0.93) are those whose random rotation plane most often lies almost entirely within the visible subspace, making the shadow \emph{nearly} rigid, a geometric, not statistical, limitation.
 
 \begin{figure}
   \centering
@@ -148,7 +148,7 @@ Empirically (Figure~\ref{fig:rigidity}): native sequences concentrate at $w \app
 \label{sec:results-static}
 
 \begin{table}
-  \caption{Static track: held-out accuracy for detecting whether a single 3D point cloud is the projection of a higher-dimensional object (chance $= 0.5$). Intrinsic-dimension estimation is structurally unable to solve the task; projection signatures are learnable.}
+  \caption{Static track: held-out accuracy for detecting whether a single 3D point cloud is the projection of a higher-dimensional object (chance $= 0.5$). Threshold methods and PointNet-lite report mean $\pm$ standard deviation over five random splits/seeds; the feature and homology baselines are 5-fold cross-validation. Intrinsic-dimension estimation is structurally unable to solve the task; projection signatures are learnable.}
   \label{tab:static}
   \centering
   \begin{tabular}{lcc}
@@ -156,11 +156,11 @@ Empirically (Figure~\ref{fig:rigidity}): native sequences concentrate at $w \app
     Method & Learned params & Accuracy \\
     \midrule
     Chance & --- & 0.500 \\
-    TwoNN threshold \citep{facco2017twonn} & 0 & 0.710 \\
-    Levina--Bickel MLE threshold \citep{levina2005mle} & 0 & 0.732 \\
+    TwoNN threshold \citep{facco2017twonn} & 0 & 0.718 $\pm$ 0.006 \\
+    Levina--Bickel MLE threshold \citep{levina2005mle} & 0 & 0.737 $\pm$ 0.004 \\
     Persistent homology + GBT & --- & \tdaacc \\
     Geometric features + GBT & --- & 0.956 \\
-    \textbf{PointNet-lite (ours)} & 190k & \textbf{0.966} \\
+    \textbf{PointNet-lite (ours)} & 190k & \textbf{0.962 $\pm$ 0.003} \\
     \bottomrule
   \end{tabular}
 \end{table}
@@ -196,7 +196,7 @@ Table~\ref{tab:holdout} shows two consistent patterns: (i) detection transfers w
 
 \subsection{Temporal track}
 
-The rigidity witness (Section~\ref{sec:witness}) dominates: AUROC 0.982 with zero parameters, against 96.6\% for the best learned static method. \textbf{Motion reveals dimensionality that still frames hide}, consistent with, and now quantifying, the human results of \citet{he2023rigidity}.
+The rigidity witness (Section~\ref{sec:witness}) dominates: AUROC 0.982 with zero parameters, against 96.2\% for the best learned static method. \textbf{Motion reveals dimensionality that still frames hide}, consistent with, and now quantifying, the human results of \citet{he2023rigidity}.
 
 \section{Limitations and ethics}
 

@@ -66,11 +66,16 @@ Static track, 10,800 clouds, held-out evaluation:
 | Method | Learned params | Accuracy |
 |---|---|---|
 | Chance | none | 0.500 |
-| TwoNN threshold (Facco et al. 2017) | 0 | 0.710 |
-| Levina-Bickel MLE threshold (2005) | 0 | 0.732 |
+| TwoNN threshold (Facco et al. 2017) | 0 | 0.718 +/- 0.006 |
+| Levina-Bickel MLE threshold (2005) | 0 | 0.737 +/- 0.004 |
 | Persistent homology + gradient boosting | n/a | 0.904 |
 | Geometric features + gradient boosting | n/a | 0.956 |
-| PointNet-lite | 190k | 0.966 |
+| PointNet-lite | 190k | 0.962 +/- 0.003 |
+
+Threshold methods and PointNet report mean and standard deviation over five
+random splits or training seeds; the feature and homology baselines use
+5-fold cross-validation. The rigidity test below scores 0.978 +/- 0.004
+held-out accuracy over five splits.
 
 Temporal track, 1,800 sequences: a zero-parameter test does better than
 everything above. Fit the optimal rigid 3D alignment (Kabsch) between

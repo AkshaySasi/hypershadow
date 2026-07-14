@@ -1,0 +1,38 @@
+{
+  "holdout_shapes": null,
+  "model": "pointnet_lite",
+  "params": 190914,
+  "device": "cuda",
+  "test_accuracy": 0.9657407407407408,
+  "val_accuracy": 0.9666666666666667,
+  "per_tier": {
+    "0": 0.9844357976653697,
+    "1": 0.9696428571428571,
+    "2": 0.9715909090909091,
+    "3": 0.9390681003584229
+  },
+  "per_shape": {
+    "ball": 0.8230088495575221,
+    "clifford_torus_4d": 0.984251968503937,
+    "cube_surface": 1.0,
+    "cylinder": 1.0,
+    "duocylinder_ridge_4d": 1.0,
+    "ellipsoid": 1.0,
+    "hyperball_4d": 1.0,
+    "hypercube_5d": 1.0,
+    "hypersphere_4d": 0.9787234042553191,
+    "hypersphere_5d": 0.54,
+    "hypertorus_4d": 0.9841269841269841,
+    "hypertorus_5d": 1.0,
+    "random_manifold_5d": 0.9917355371900827,
+    "random_manifold_6d": 1.0,
+    "sphere": 1.0,
+    "tesseract_4d": 1.0,
+    "torus": 1.0,
+    "trefoil_tube": 1.0
+  },
+  "epochs": 60,
+  "seed": 0,
+  "n_train": 7560,
+  "n_test": 2160
+}
