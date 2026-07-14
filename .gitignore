@@ -1,0 +1,10 @@
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+data/
+data_pilot/
+*.npz
+paper/preview/
+paper/Hypershadow_draft.pdf
+paper/Hypershadow_draft2.pdf

@@ -1,0 +1,33 @@
+{
+  "method": "kabsch_rigidity_threshold",
+  "learned_params": 0,
+  "auroc": 0.982312987012987,
+  "held_out_accuracy": 0.9822222222222222,
+  "threshold": 0.050454824741168136,
+  "mean_residual_native": 0.024412972378017306,
+  "mean_residual_projected": 0.09766507612140926,
+  "per_tier": {
+    "0": 0.9649122807017544,
+    "1": 1.0
+  },
+  "per_shape": {
+    "ball": 1.0,
+    "clifford_torus_4d": 0.92,
+    "cube_surface": 1.0,
+    "cylinder": 1.0,
+    "duocylinder_ridge_4d": 0.94,
+    "ellipsoid": 1.0,
+    "hyperball_4d": 0.94,
+    "hypercube_5d": 1.0,
+    "hypersphere_4d": 0.94,
+    "hypersphere_5d": 1.0,
+    "hypertorus_4d": 0.96,
+    "hypertorus_5d": 0.99,
+    "random_manifold_5d": 0.99,
+    "random_manifold_6d": 0.99,
+    "sphere": 1.0,
+    "tesseract_4d": 0.93,
+    "torus": 1.0,
+    "trefoil_tube": 1.0
+  }
+}

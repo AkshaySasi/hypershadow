@@ -1,0 +1,12 @@
+{
+  "twonn": {
+    "held_out_threshold_accuracy": 0.71,
+    "mean_id_native": 2.5237579394089478,
+    "mean_id_projected": 2.8838251003630218
+  },
+  "levina_bickel": {
+    "held_out_threshold_accuracy": 0.7315,
+    "mean_id_native": 1.713283443332416,
+    "mean_id_projected": 2.09952155175131
+  }
+}

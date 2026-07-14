@@ -1,0 +1,19 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "hypershadow"
+version = "0.1.0"
+description = "Benchmark for detecting 3D projections of higher-dimensional spatial objects"
+readme = "README.md"
+license = { text = "MIT" }
+requires-python = ">=3.9"
+dependencies = ["numpy>=1.24"]
+
+[project.optional-dependencies]
+full = ["matplotlib>=3.7", "scikit-learn>=1.3"]
+dev = ["pytest>=7"]
+
+[tool.setuptools.packages.find]
+include = ["hypershadow*", "baselines*"]

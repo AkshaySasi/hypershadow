@@ -1,0 +1,31 @@
+{
+  "method": "persistence_features_hgb",
+  "accuracy": 0.9041666666666667,
+  "per_tier": {
+    "0": 0.9203821656050956,
+    "1": 0.935374149659864,
+    "2": 0.8908450704225352,
+    "3": 0.8701298701298701
+  },
+  "per_shape": {
+    "ball": 0.2857142857142857,
+    "clifford_torus_4d": 0.8676470588235294,
+    "cube_surface": 0.9830508474576272,
+    "cylinder": 0.96875,
+    "duocylinder_ridge_4d": 0.7833333333333333,
+    "ellipsoid": 0.9833333333333333,
+    "hyperball_4d": 0.9830508474576272,
+    "hypercube_5d": 0.9841269841269841,
+    "hypersphere_4d": 0.9583333333333334,
+    "hypersphere_5d": 0.875,
+    "hypertorus_4d": 0.9692307692307692,
+    "hypertorus_5d": 1.0,
+    "random_manifold_5d": 1.0,
+    "random_manifold_6d": 1.0,
+    "sphere": 0.9722222222222222,
+    "tesseract_4d": 0.9827586206896551,
+    "torus": 0.984375,
+    "trefoil_tube": 0.9365079365079365
+  },
+  "n": 1200
+}

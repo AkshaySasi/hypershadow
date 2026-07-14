@@ -1,0 +1,25 @@
+{
+  "holdout_shapes": [
+    "hypertorus_4d",
+    "hypertorus_5d"
+  ],
+  "model": "pointnet_lite",
+  "params": 190914,
+  "device": "cuda",
+  "test_accuracy": 0.91,
+  "val_accuracy": 0.9572916666666667,
+  "per_tier": {
+    "0": 0.87,
+    "1": 0.93,
+    "2": 0.9433333333333334,
+    "3": 0.8966666666666666
+  },
+  "per_shape": {
+    "hypertorus_4d": 0.82,
+    "hypertorus_5d": 1.0
+  },
+  "epochs": 40,
+  "seed": 0,
+  "n_train": 8640,
+  "n_test": 1200
+}

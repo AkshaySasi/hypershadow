@@ -1,0 +1,12 @@
+{
+  "method": "geometric_features_hgb",
+  "accuracy": 0.956,
+  "per_tier": {
+    "0": 0.967,
+    "1": 0.967,
+    "2": 0.956,
+    "3": 0.933
+  },
+  "per_shape_note": "recorded from the completed 2026-07-13 run on data/static.npz (n=10800, 5-fold CV); rerun baselines.features to regenerate with full per-shape detail",
+  "n": 10800
+}

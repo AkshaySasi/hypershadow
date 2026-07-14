@@ -1,0 +1,25 @@
+{
+  "holdout_shapes": [
+    "tesseract_4d",
+    "hypercube_5d"
+  ],
+  "model": "pointnet_lite",
+  "params": 190914,
+  "device": "cuda",
+  "test_accuracy": 0.795,
+  "val_accuracy": 0.9625,
+  "per_tier": {
+    "0": 0.76,
+    "1": 0.73,
+    "2": 0.8166666666666667,
+    "3": 0.8733333333333333
+  },
+  "per_shape": {
+    "hypercube_5d": 0.9516666666666667,
+    "tesseract_4d": 0.6383333333333333
+  },
+  "epochs": 40,
+  "seed": 0,
+  "n_train": 8640,
+  "n_test": 1200
+}
