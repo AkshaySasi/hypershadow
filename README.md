@@ -201,8 +201,12 @@ particular 3D model classes tested, which is a much weaker statement.
             Higher-Dimensional Spatial Objects},
   author = {Sasi, Akshay},
   year   = {2026},
+  url    = {https://github.com/AkshaySasi/hypershadow},
 }
 ```
+
+Dataset: https://huggingface.co/datasets/AkshaySasi/hypershadow
+Models: https://huggingface.co/AkshaySasi/hypershadow-models
 
 ## License
 

@@ -1,4 +1,4 @@
-"""Upload the HyperShadow dataset and models to the Hugging Face Hub.
+r"""Upload the HyperShadow dataset and models to the Hugging Face Hub.
 
 Usage (PowerShell):
     $env:HF_TOKEN = "hf_..."           # a WRITE token from hf.co/settings/tokens

@@ -88,8 +88,9 @@ Temporal track: Kabsch rigidity residual threshold, AUROC 0.982.
 ## Reproducing or extending
 
 The generator is plain seeded NumPy, no GPU needed. Code, tests, and all
-baseline implementations are in the GitHub repository (link in the
-citation section once the paper is up). Regenerating with the published
+baseline implementations are at
+https://github.com/AkshaySasi/hypershadow. Trained checkpoints are at
+https://huggingface.co/AkshaySasi/hypershadow-models. Regenerating with the published
 seeds reproduces these exact files. New shape families can be added with
 a single sampler function.
 
