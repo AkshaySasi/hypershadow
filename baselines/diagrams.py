@@ -77,31 +77,72 @@ def pipeline(out: Path) -> None:
 
 
 def architecture(out: Path) -> None:
-    fig, ax = plt.subplots(figsize=(9.6, 2.7), facecolor=SURFACE)
-    ax.set_xlim(-0.02, 1.02)
-    ax.set_ylim(-0.04, 1.04)
+    """Block heights encode feature width; tensor shapes annotate the flow."""
+    fig, ax = plt.subplots(figsize=(10.5, 3.6), facecolor=SURFACE)
+    ax.set_xlim(0, 11.4)
+    ax.set_ylim(-0.7, 3.3)
     ax.axis("off")
+    ax.set_aspect("equal")
 
-    stages = [
-        ("Input cloud", ["1024 × 3"], BLUE),
-        ("Shared MLP", ["1×1 conv 64", "BN + ReLU"], AQUA),
-        ("Shared MLP", ["1×1 conv 128", "BN + ReLU"], AQUA),
-        ("Shared MLP", ["1×1 conv 256", "BN + ReLU"], AQUA),
-        ("Pool", ["max ⊕ mean", "512-d"], VIOLET),
-        ("Head", ["256 → 64 → 2", "dropout 0.3"], YELLOW),
-        ("Output", ["native 3D vs", "N-D shadow"], BLUE),
-    ]
-    w, gap = 0.102, 0.045
-    x = 0.01
-    for i, (title, lines, edge) in enumerate(stages):
-        _box(ax, x, 0.22, w, 0.56, title, lines, edge=edge)
-        if i < len(stages) - 1:
-            _arrow(ax, x + w + 0.014, 0.50, x + w + gap - 0.012, 0.50)
-        x += w + gap
-    ax.set_title("PointNet-lite architecture (190,914 parameters, trains in 4 min on a 4 GB GPU)",
-                 fontsize=10.5, color=INK, pad=10)
+    def block(x, width, ch, title, sub, color, max_h=2.2, base=0.25):
+        h = base + max_h * (np.log2(ch) / np.log2(512))
+        y = 1.0 - h / 2
+        ax.add_patch(FancyBboxPatch((x, y), width, h, boxstyle="round,pad=0.03",
+                                    fc=color, ec="none", alpha=0.18))
+        ax.add_patch(FancyBboxPatch((x, y), width, h, boxstyle="round,pad=0.03",
+                                    fc="none", ec=color, lw=2.0))
+        ax.text(x + width / 2, y + h + 0.30, title, ha="center", va="bottom",
+                fontsize=9.5, color=INK, fontweight="bold")
+        ax.text(x + width / 2, y + h + 0.08, sub, ha="center", va="bottom",
+                fontsize=7.6, color=MUTED)
+        return x + width, y, h
+
+    def flow(x0, x1, label=""):
+        ax.add_patch(FancyArrowPatch((x0 + 0.07, 1.0), (x1 - 0.07, 1.0),
+                                     arrowstyle="-|>", mutation_scale=13,
+                                     color=MUTED, lw=1.5))
+        if label:
+            ax.text((x0 + x1) / 2, 0.78, label, ha="center", va="top",
+                    fontsize=7.2, color=MUTED)
+
+    # input: a small point-cloud glyph
+    rng = np.random.default_rng(3)
+    pts = rng.standard_normal((90, 3))
+    pts /= np.linalg.norm(pts, axis=1, keepdims=True)
+    ax.scatter(0.65 + 0.42 * pts[:, 0], 1.0 + 0.42 * pts[:, 1],
+               s=3.5, c=BLUE, alpha=0.7, zorder=3)
+    ax.text(0.65, 1.72, "input cloud", ha="center", fontsize=9.5,
+            color=INK, fontweight="bold")
+    ax.text(0.65, 1.56, "1024 points in 3D", ha="center", fontsize=7.6, color=MUTED)
+
+    flow(1.15, 1.75, "1024×3")
+    x, _, _ = block(1.75, 0.85, 64, "shared MLP", "1×1 conv, BN, ReLU", AQUA)
+    flow(x, x + 0.55, "1024×64")
+    x, _, _ = block(x + 0.55, 0.85, 128, "shared MLP", "1×1 conv, BN, ReLU", AQUA)
+    flow(x, x + 0.55, "1024×128")
+    x, _, _ = block(x + 0.55, 0.85, 256, "shared MLP", "1×1 conv, BN, ReLU", AQUA)
+    flow(x, x + 0.55, "1024×256")
+    x, _, _ = block(x + 0.55, 0.95, 512, "pool", "max + mean concat", VIOLET)
+    flow(x, x + 0.55, "512")
+    x, _, _ = block(x + 0.55, 0.85, 256, "dense", "ReLU, dropout 0.3", YELLOW)
+    flow(x, x + 0.5, "256")
+    x, _, _ = block(x + 0.5, 0.7, 64, "dense", "ReLU", YELLOW)
+    flow(x, x + 0.5, "64")
+
+    # output: two class chips
+    for dy, lab, c in [(0.33, "native 3D", BLUE), (-0.63, "N-D shadow", YELLOW)]:
+        ax.add_patch(FancyBboxPatch((x + 0.5, 1.0 + dy - 0.06), 1.25, 0.42,
+                                    boxstyle="round,pad=0.03", fc=c, ec="none", alpha=0.18))
+        ax.add_patch(FancyBboxPatch((x + 0.5, 1.0 + dy - 0.06), 1.25, 0.42,
+                                    boxstyle="round,pad=0.03", fc="none", ec=c, lw=1.8))
+        ax.text(x + 0.5 + 0.625, 1.0 + dy + 0.15, lab, ha="center", va="center",
+                fontsize=8.4, color=INK)
+
+    ax.set_title("PointNet-lite: 190,914 parameters, trains in 4 minutes on a 4 GB GPU",
+                 fontsize=11, color=INK, pad=12)
     fig.tight_layout()
-    fig.savefig(out / "architecture.png", dpi=200, facecolor=SURFACE)
+    fig.savefig(out / "architecture.png", dpi=200, facecolor=SURFACE,
+                bbox_inches="tight", pad_inches=0.15)
     print(f"saved {out / 'architecture.png'}")
 
 
