@@ -1,173 +1,260 @@
 # I Taught an AI to Recognize the Shadows of Four-Dimensional Objects
 
-*How a blurry Pentagon UFO video led me to build a benchmark, a detector, and an arXiv paper, on a laptop with a 4 GB GPU.*
+*How a blurry Pentagon UFO video turned into a dataset, a detector, and an
+arXiv paper, built entirely on a laptop with a 4 GB GPU.*
 
 ---
 
 ## It started with a weird video
 
-A few years ago the Pentagon released a batch of UAP footage. One clip showed
-a strange star-shaped object drifting across the night sky, and the internet
-did what the internet does: aliens, obviously.
+A few years ago the Pentagon released a batch of UAP footage. One clip
+showed a strange star-shaped object drifting across the night sky, and the
+internet did what the internet does: aliens, obviously.
 
 My first thought was different. I thought about shadows.
 
-Hold a cube in front of a lamp and its shadow on the wall is a hexagon, or a
-square, or something in between, depending on how you turn it. The shadow is
-genuinely two-dimensional, but it is not an honest 2D object. It is a 3D
-object wearing a 2D disguise. So I wondered: if something four-dimensional
-ever moved through our world, we would not see it as it is. We would see its
-3D shadow. And it would look, for lack of a better word, weird.
+Hold a cube in front of a lamp. Its shadow on the wall might be a square, a
+hexagon, or something in between, depending on how you turn it. The shadow
+is genuinely two-dimensional, every point of it lies flat on the wall, but
+it is not an honest 2D object. It is a 3D object wearing a 2D disguise.
 
-(For the record: that star-shaped object was later convincingly explained as
-bokeh, an out-of-focus light source filtered through a triangular camera
-aperture. The mundane explanation won, as it almost always does. Remember
-this, it matters later.)
+So I wondered: if something four-dimensional ever moved through our world,
+we would not see it as it is. We would see its 3D shadow. And that shadow
+would look, for lack of a better word, weird.
 
-The question that stuck with me was not "was that a UFO". It was: **if a
-higher-dimensional object cast a shadow into our world, could we even tell?
-Is a 4D shadow measurably different from an ordinary 3D thing?**
+(For the record: that star-shaped object was later convincingly explained
+as bokeh, an out-of-focus light source filtered through a triangular camera
+aperture. The boring explanation won, as it almost always does. Hold onto
+that thought, it comes back at the end.)
 
-Nobody had ever tested this. So I did.
+The question that stayed with me was not "was that a UFO." It was sharper
+and more interesting:
 
-## Turning a shower thought into an experiment
+**If a higher-dimensional object cast a shadow into our world, could we
+even tell? Is a 4D shadow measurably different from an ordinary 3D thing?**
 
-Here is the problem with questions like this: you cannot go collect 4D
-objects. But you can do the next best thing, which is what physics has always
-done with untestable-sounding questions: build a controlled laboratory where
-you know the ground truth, and ask whether the difference is detectable
-*in principle*.
+I searched the literature. Vision scientists had studied whether humans can
+perceive 4D structure. Mathematicians had written about projections for a
+century. But nobody had ever built a dataset, trained a detector, or put a
+number on it. The question was sitting there, untouched.
 
-Computers do not care how many dimensions an array has. A point in 4D space
-is just four numbers. So I built a generator that creates:
+So I did it myself.
 
-- **Ordinary 3D shapes**: spheres, cubes, donuts, cylinders, a knotted tube.
-- **Genuinely four, five and six dimensional shapes**: hyperspheres,
-  tesseracts, Clifford tori, objects most people have only seen in YouTube
-  animations.
+## Wait, how do you even make a 4D object?
 
-Then I rotated each higher-dimensional object randomly in its own space and
-projected it down to 3D, exactly the way a lamp projects a cube onto a wall.
-The result is a dataset of 10,800 point clouds: half of them honest 3D
-objects, half of them shadows of something bigger.
+Here is the trick that makes the whole project possible: computers do not
+care how many dimensions your data has.
 
-And because I did not want to fool myself, I spent most of my design effort
-on ways the experiment could cheat:
+A point in 3D space is three numbers: (x, y, z). A point in 4D space is
+just four numbers: (x, y, z, w). NumPy will happily store a million of
+them. You cannot *look* at them directly, but you can do math with them,
+rotate them, and most importantly, project them.
 
-- Every cloud is centred, rescaled and resampled to the same point count, so
-  size and position carry no information.
-- The ordinary 3D shapes get the same random rotations and the same noise,
-  occlusion and sensor corruption as the shadows.
-- The 3D class includes a solid ball, because the shadow of a 4D hypersphere
-  is also a solid ball. "It fills a volume" is not allowed to be the answer.
+Projection is what a lamp does to a cube. Mathematically, the simplest
+version is almost embarrassing: to project a 4D point down to 3D, you
+delete the fourth number. That is it. The shadow of a 4D object is what
+remains when one coordinate is thrown away, exactly the way a cube's
+shadow is what remains when depth is thrown away.
 
-That last point deserves a pause. The shadow of a 4D sphere IS a 3D ball.
-Identical silhouette. The only difference is *where the mass concentrates
-inside*. If you want to catch it, you need to notice density, not shape.
+So the recipe for the dataset, which I called **HyperShadow**, is:
 
-## What the experiments found
+1. **Generate ordinary 3D shapes**: spheres, solid balls, donuts, cubes,
+   cylinders, ellipsoids, even a tube wrapped around a trefoil knot.
+   These get the label "native 3D."
+2. **Generate genuinely higher-dimensional shapes**: the 4D sphere, the
+   tesseract (the 4D cube you have seen spinning in YouTube animations),
+   the Clifford torus, 5D and 6D objects, and randomly generated smooth
+   4D-6D surfaces so the collection never repeats itself.
+3. **Rotate each higher-dimensional object randomly in its own space**,
+   then project it down to 3D. These get the label "shadow."
+4. Ask: can anything tell the two classes apart?
 
-I ran four kinds of detectors on this dataset. The results surprised me
-twice.
+The final dataset is 10,800 point clouds of 1,024 points each, plus 1,800
+short "movies" of rotating objects. All of it generates from two random
+seeds on a normal CPU in minutes. No supercomputer anywhere in this story.
 
-**Surprise one: the obvious tool fails.** The textbook approach for "what
-dimension is my data" is intrinsic-dimension estimation (methods like TwoNN
-and maximum-likelihood estimators). They scored about 72 to 74 percent,
-barely better than a coin flip with a thumb on the scale. And in hindsight
-the reason is beautiful: a shadow is still 3D data. Its dimension is not the
-clue. The clue is what projection *does* to density and topology on the way
-down.
+## The paranoid part (which is the most important part)
 
-**A small neural network does much better.** A deliberately tiny PointNet,
-190k parameters, four minutes of training on my GTX 1650 Ti, reached 96.2
-percent accuracy. More interestingly, when I held out entire shape families
-during training, it still detected them at 79 to 91 percent. It had not
-memorised my shape catalogue. It had learned what projection itself looks
-like.
+Any machine learning person reading this is already suspicious, and they
+should be. Synthetic datasets are notorious for hidden shortcuts: the model
+"solves" the task by noticing something dumb, like one class being slightly
+bigger, and you fool yourself into thinking it learned something deep.
 
-**Surprise two: the best detector has zero parameters.** This is my favourite
-result in the paper. Watch an object *move* instead of looking at a still
-frame. A rigid 3D object that rotates can always be aligned frame-to-frame
-by a rigid 3D transform, that is essentially the definition of rigid. But
-the shadow of a rigidly rotating 4D object morphs. No rigid 3D motion can
-explain it. Measure the leftover "impossible deformation" with the Kabsch
-algorithm, a closed-form formula from the 1970s, and you get a single number
-that separates the two classes with AUROC 0.982. No training. No neural
-network. One threshold.
+I spent more time closing loopholes than building models. The rules:
 
-Motion leaks dimensional information that still images hide. Humans, by the
-way, seem to sense a version of this too: a 2023 vision-science study found
-that people in VR can distinguish rigid from non-rigid motion of a
-hypercube's projection. Now there is a machine baseline to compare against.
+- **Same treatment for both classes.** The ordinary 3D shapes get random
+  rotations too, and the same noise and corruption as the shadows. Nothing
+  about the preprocessing distinguishes the classes.
+- **No free information.** Every cloud is centred at the origin, rescaled
+  to the same average radius, and resampled to exactly 1,024 points. Size,
+  position, and point count carry zero signal.
+- **The killer rule: volume is not the answer.** Here is a fact that
+  surprised me when I first plotted it. The shadow of a 4D sphere is not a
+  hollow sphere. It is a **solid ball**. Every interior point gets filled
+  in. So if the dataset only had hollow 3D shapes, a model could win by
+  answering "is it filled?" To block this, I put a genuine solid ball in
+  the ordinary-3D class. Now "filled" is not enough. The only difference
+  between a real ball and a hypersphere's shadow is *where the mass
+  concentrates inside*, and it takes real statistical work to see it.
+- **Difficulty tiers.** Each cloud comes in four versions: clean, noisy,
+  partially occluded, and corrupted with sensor-style dropout, so methods
+  can be stress-tested the way real data would stress them.
 
-## What this does not prove (and why that is the point)
+## Experiment one: the obvious tool fails, and the failure is beautiful
 
-Let me be very clear, because this topic attracts wishful thinking like a
-porch light attracts moths: **none of this says higher dimensions exist.**
-Everything was tested on simulated geometry where I knew the right answer.
+If you ask a data scientist "how do I check the dimension of my data," they
+will point you at intrinsic-dimension estimators, classic algorithms like
+TwoNN and maximum-likelihood estimation. These look at how points crowd
+around their neighbours and infer the dimensionality of whatever surface
+the data lives on.
 
-What it does establish is narrower and, I think, more interesting:
+I ran them on HyperShadow. They scored 72 to 74 percent. Barely better
+than guessing.
 
-1. Higher-dimensional shadows carry detectable statistical fingerprints,
-   even under noise, occlusion and sensor-like corruption.
-2. The standard dimensionality tools cannot see those fingerprints, and
-   learned or motion-based methods can.
-3. There exist what I call *dimensional witnesses*: numbers you can compute
-   from ordinary 3D observations that are provably near zero under any rigid
-   3D explanation. A large value does not tell you what the data is. It
-   tells you what the data is *not*, and "not explainable by any rigid 3D
-   process" is a statement with teeth.
+And once you see why, you cannot unsee it: **a shadow is still
+three-dimensional data.** Every point of the shadow lives in 3D. There is
+no fourth coordinate left to detect; projection destroyed it. Asking "what
+dimension is this data" gives an honest answer, "at most three," which is
+true and useless.
 
-That third idea is the one I care about long-term. It has the same logical
-shape as a Bell inequality: you never observe the hidden thing directly, you
-rule out the entire class of explanations that lack it. Bell did not
-photograph hidden variables. He found a number whose violation made a whole
-worldview untenable. The rigidity witness is a toy-scale cousin of that
-logic, applied to spatial dimensions, validated in a lab where the truth is
-known.
+The dimension is not the clue. The clue is what projection *does* to the
+object on the way down: it folds density into telltale patterns, fills
+volumes with a specific radial profile, and scrambles topology. The
+evidence of the fourth dimension is not in the dimension. It is in the
+fingerprints of the squashing.
 
-If genuinely multi-sensor, properly tracked anomaly data ever becomes
-public, tools like this are how you would analyse it honestly: not "is it
-aliens" but "is any rigid 3D explanation consistent with this trajectory".
-And when the answer comes back "yes, a bird explains it fine", that is the
-tool working, not failing. Remember the bokeh.
+This, to me, is the most quotable finding of the paper: *dimensionality is
+the wrong observable.*
 
-## The part nobody tells you about doing research alone
+## Experiment two: a small neural network sees the fingerprints
 
-Some honest numbers, because I wish someone had told me this before I
-started:
+Next I trained a deliberately tiny PointNet-style network. 190,914
+parameters, which by 2026 standards is microscopic, and about four minutes
+of training on my GTX 1650 Ti.
 
-- Total hardware: one laptop, GTX 1650 Ti, 4 GB of VRAM, 8 GB of RAM. The
-  full training run takes four minutes. Every experiment in the paper
+Result: **96.2 percent accuracy** (plus or minus 0.3 over five training
+runs), degrading gracefully from 98 percent on clean data to 94 percent on
+the heavily corrupted tier.
+
+Two details matter more than the headline number.
+
+First, **it generalizes to shapes it has never seen.** I retrained the
+model with entire object families deleted from the training set, then
+tested only on the deleted family. Hypertori it had never encountered:
+detected at 91 percent. Hypercubes: 79 percent. The model did not memorize
+my shape catalogue. It learned what *projection itself* looks like.
+
+Second, **its mistakes are exactly the ones mathematics predicts.** Its
+worst confusion, by far, is the solid ball versus the 4D sphere's shadow,
+the pair that differs only in interior density. When a model's failure
+modes line up with theory, you can start to trust that the benchmark is
+measuring something real.
+
+## Experiment three: motion betrays the fourth dimension (my favourite result)
+
+Everything above uses still snapshots. The best detector in the paper uses
+none of that machinery. It uses motion, and it has **zero trained
+parameters**.
+
+Here is the idea. Take a rigid 3D object, a rock, a chair, anything, and
+rotate it. Every frame of that motion can be perfectly explained by a
+rigid 3D transformation: some rotation plus some shift. That is
+essentially the definition of "rigid."
+
+Now take a rigid 4D object, rotate it rigidly in 4D, and watch its 3D
+shadow. The shadow *morphs*. Parts swell, shrink, and flow through each
+other, like the spinning tesseract animations where cubes turn inside out.
+The object is perfectly rigid. Its shadow is not, and, this is the crucial
+part, **no rigid 3D motion can explain the shadow's frame-to-frame
+changes.**
+
+That impossibility is measurable. There is a closed-form formula from the
+1970s, the Kabsch algorithm, that computes the best possible rigid
+alignment between two point sets and tells you the leftover error. For a
+real 3D object in rigid motion, the leftover is basically zero. For the
+shadow of a rotating 4D object, it cannot be zero.
+
+I computed that one number per sequence. Real 3D motion: residual about
+0.02. Shadows: about 0.10, four times higher. A single threshold on this
+single number separates the classes with **AUROC 0.982**. No neural
+network. No training. A fifty-year-old formula and a ruler.
+
+I call this a **rigidity witness**, and it is the idea I care most about,
+because of its logical shape. A large residual does not merely *suggest*
+higher-dimensional origin. It *rules out* every rigid-3D explanation at
+once. You never observe the fourth dimension. You certify that the
+three-dimensional story cannot be true. Physics fans will recognize the
+family resemblance to Bell inequalities, which never photographed hidden
+variables, they made an entire class of worldviews untenable with one
+measured number.
+
+Also worth savouring: motion reveals what snapshots hide. A 2023 vision
+science study found that humans can distinguish rigid from non-rigid
+motion of a hypercube's projection too. Whatever our visual system is
+doing, it seems to have stumbled onto a version of the same trick.
+
+## So... did I find 4D aliens?
+
+No. And the paper says so in bold letters, because this is where projects
+like this one live or die.
+
+Everything above was tested on simulated geometry, where I knew the ground
+truth. That is the only honest way to start: you validate the instrument
+where the answer is known. What the work establishes is precisely this:
+
+1. Shadows of higher-dimensional objects carry detectable statistical
+   fingerprints, even under noise and occlusion.
+2. The standard dimensionality tools cannot see those fingerprints.
+   Learned models and motion-based tests can.
+3. There exist simple, interpretable numbers, dimensional witnesses, that
+   are provably near zero under any rigid 3D explanation, so a large value
+   rules that entire class of explanations out.
+
+What it does not establish is anything about physical reality. If someone
+someday points tools like this at real tracked data and the witness fires,
+the correct conclusion is "no rigid 3D model of the tested kind explains
+this," followed by a long, boring, necessary hunt through every mundane
+cause: tracking errors, non-rigid objects, optics, atmospherics.
+
+Remember the bokeh. The star-shaped UFO that started this whole project
+turned out to be a camera artifact, and the person who figured that out
+did better science that day than anyone shouting about aliens. If this
+project has a moral, it is that you can take a fringe-sounding question
+seriously *by being stricter than everyone else about it*, not looser.
+
+## What surprised me about doing this solo
+
+- **The hardware was never the bottleneck.** One laptop, 4 GB of GPU
+  memory, 8 GB of RAM (and yes, it crashed from memory pressure more than
+  once). Full training run: four minutes. Every number in the paper
   reproduces overnight on hardware most gamers would call outdated.
-- The dataset generator is plain NumPy. No GPU needed at all.
-- The most valuable hours were not spent training models. They were spent
-  designing ways my own experiment could lie to me, and closing them one by
-  one. The fairness rules in the paper took longer than the neural network.
-- The scariest moment was finding a 2023 paper studying almost the same
-  question in humans. It turned out to be the best thing that happened to
-  the project: it proved the question was scientifically respectable, and
-  it gave my machine results a human baseline to stand next to.
-
-I genuinely believe there are hundreds of questions like this one sitting in
-plain sight: too strange for a grant proposal, too small for a lab, exactly
-right for one stubborn person with a consumer GPU.
+- **The design work mattered more than the model.** The fairness rules
+  took longer than the neural network. They are also the reason the
+  results survive scrutiny.
+- **Finding a rival paper was the best thing that happened.** Midway
+  through, I found the 2023 human-perception study of 4D rigidity. For an
+  hour it felt like being scooped. Then I realized: no dataset, no
+  algorithm, no benchmark existed. Their work proved the question was
+  respectable, and mine gives their humans a machine to compete with.
+- **There are more questions like this.** Too strange for a grant, too
+  small for a lab, exactly right for one stubborn person with a consumer
+  GPU. I suspect there are hundreds of them lying around.
 
 ## Try it yourself
 
-Everything is public and reproducible from seeds:
+Everything is public, seeded, and reproducible:
 
 - **Paper (arXiv):** [ARXIV_LINK]
 - **Code and tests:** https://github.com/AkshaySasi/hypershadow
 - **Dataset (Hugging Face):** https://huggingface.co/datasets/AkshaySasi/hypershadow
 - **Trained models:** https://huggingface.co/AkshaySasi/hypershadow-models
 
-Generate the data with one command, train the detector in four minutes, or
-just load the point clouds and look at them. The shadow of a tesseract is a
-genuinely strange thing to rotate in a matplotlib window at 1 a.m., and I
-say that with affection.
+Generate the data with one command. Train the detector in four minutes.
+Or just load a tesseract's shadow and rotate it in a matplotlib window at
+1 a.m., which I do not recommend for your sleep schedule but absolutely
+recommend for your sense of wonder.
 
-If you beat my baselines, tell me. That is what benchmarks are for.
+And if you beat my baselines, tell me. That is what benchmarks are for.
 
 ---
 
