@@ -16,6 +16,8 @@ size_categories:
 
 # HyperShadow
 
+**Paper:** [arXiv:2607.14419](https://arxiv.org/abs/2607.14419)
+
 A benchmark for one question: given a 3D point cloud, can you tell whether
 it is an ordinary 3D object or the 3D projection (the "shadow") of an
 object from a higher spatial dimension?
@@ -111,9 +113,13 @@ the human 4D-rigidity perception results reported by He, Bi and Zaidi
 
 ```bibtex
 @misc{hypershadow2026,
-  title  = {HyperShadow: A Benchmark for Detecting 3D Projections of
-            Higher-Dimensional Spatial Objects},
-  author = {Sasi, Akshay},
-  year   = {2026},
+  title         = {HyperShadow: A Benchmark for Detecting 3D Projections of
+                   Higher-Dimensional Spatial Objects},
+  author        = {Sasi, Akshay},
+  year          = {2026},
+  eprint        = {2607.14419},
+  archivePrefix = {arXiv},
+  primaryClass  = {cs.LG},
+  url           = {https://arxiv.org/abs/2607.14419},
 }
 ```

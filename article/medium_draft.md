@@ -11,7 +11,11 @@ A few years ago the Pentagon released a batch of UAP footage. One clip
 showed a strange star-shaped object drifting across the night sky, and the
 internet did what the internet does: aliens, obviously.
 
-My first thought was different. I thought about shadows.
+My first thought was different. Let's assume, just for a moment, that it
+really was something alien. Would we be seeing the actual thing, or only
+the version we humans are equipped to perceive, in 3D? That led to a
+sharper question: how could we ever know whether something we see is a
+true 3D object, or the shadow of something higher-dimensional?
 
 Hold a cube in front of a lamp. Its shadow on the wall might be a square, a
 hexagon, or something in between, depending on how you turn it. The shadow
@@ -244,7 +248,7 @@ seriously *by being stricter than everyone else about it*, not looser.
 
 Everything is public, seeded, and reproducible:
 
-- **Paper (arXiv):** [ARXIV_LINK]
+- **Paper (arXiv):** https://arxiv.org/abs/2607.14419
 - **Code and tests:** https://github.com/AkshaySasi/hypershadow
 - **Dataset (Hugging Face):** https://huggingface.co/datasets/AkshaySasi/hypershadow
 - **Trained models:** https://huggingface.co/AkshaySasi/hypershadow-models

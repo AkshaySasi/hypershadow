@@ -1,5 +1,7 @@
 # HyperShadow
 
+**Paper:** [arXiv:2607.14419](https://arxiv.org/abs/2607.14419)
+
 Can you tell whether a 3D point cloud is an ordinary 3D object, or the
 3D projection (the "shadow") of an object from a higher spatial dimension?
 
@@ -202,11 +204,14 @@ particular 3D model classes tested, which is a much weaker statement.
 
 ```bibtex
 @misc{hypershadow2026,
-  title  = {HyperShadow: A Benchmark for Detecting 3D Projections of
-            Higher-Dimensional Spatial Objects},
-  author = {Sasi, Akshay},
-  year   = {2026},
-  url    = {https://github.com/AkshaySasi/hypershadow},
+  title         = {HyperShadow: A Benchmark for Detecting 3D Projections of
+                   Higher-Dimensional Spatial Objects},
+  author        = {Sasi, Akshay},
+  year          = {2026},
+  eprint        = {2607.14419},
+  archivePrefix = {arXiv},
+  primaryClass  = {cs.LG},
+  url           = {https://arxiv.org/abs/2607.14419},
 }
 ```
 
