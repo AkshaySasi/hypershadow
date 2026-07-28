@@ -8,3 +8,6 @@ data_pilot/
 paper/preview/
 paper/Hypershadow_draft.pdf
 paper/Hypershadow_draft2.pdf
+
+# paper source lives on arXiv, not in the code repo
+paper/
